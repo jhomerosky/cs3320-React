@@ -7,23 +7,24 @@ class UserCart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            cartItems: ''
+            cartItems: []
         }
         this.populateCart = this.populateCart.bind(this);
         this.deleteCartItem = this.deleteCartItem.bind(this);
     }
 
-    async deleteCartItem(id){
+    async deleteCartItem(cartItemId){
         try {
             const headers = {
                 'Authorization': `Bearer: ${this.props.accessToken}`
             };
-            console.log(JSON.stringify(this.props.user.cart));
+            let cartItemList = this.state.cartItems;
             const populatedCart = (await axios.get(`http://localhost:8080/user/${this.props.user._id}/cart`, {headers})).data;
-            const response = (await axios.delete(`http://localhost:8080/cart/${populatedCart._id}/cartItem/${id}`, {headers})).data;
-            this.state.cartItems.splice(this.state.cartItems.indexOf(this.state.cartItems.find(cartItem => {
-                return cartItem._id === response._id;
-            })), 1);
+            const response = (await axios.delete(`http://localhost:8080/cart/${populatedCart._id}/cartItem/${cartItemId}`, {headers})).data;
+            cartItemList.splice(cartItemList.indexOf(cartItemList.find( (cartItem) => {
+                    return String(cartItem.key) === String(cartItemId);
+                })), 1);
+            this.setState({cartItems: cartItemList});
         } catch (err) {
             console.log(err);
         }
@@ -36,10 +37,10 @@ class UserCart extends React.Component {
             }
             const response = (await axios.get(`http://localhost:8080/user/${this.props.user._id}/cart`, {headers})).data;
             const cartItemList = [];
-            response.cartItems.forEach(cartItem => {
+            response.cartItems.forEach( (cartItem) => {
                 cartItemList.push(<li key={cartItem._id}>
                     {cartItem.storeItem.itemName}: {cartItem.quantity}
-                    <button onClick={() => this.deleteCartItem(cartItem._id)}>Delete</button></li>);
+                    <button onClick={() => {this.deleteCartItem(cartItem._id)}}>Delete</button></li>);
             });
 
             this.setState({cartItems:cartItemList})

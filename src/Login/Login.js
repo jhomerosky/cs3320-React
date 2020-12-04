@@ -46,7 +46,7 @@ class Login extends React.Component {
             return (
                 <div>
                     <UserCart user={this.state.user} accessToken={this.state.jwt}/>
-                    <Store accessToken={this.state.jwt}/>
+                    <Store user={this.state.user} accessToken={this.state.jwt}/>
                 </div>
             )
         }
